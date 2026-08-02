@@ -13,7 +13,7 @@ import hashlib
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import httpx
@@ -613,7 +613,7 @@ async function sendMessage() {{
 """)
 
 # ============================================================
-# ADMIN DASHBOARD
+# ADMIN PAGES - ALL 6
 # ============================================================
 @app.get("/admin")
 async def admin_dashboard():
@@ -686,9 +686,6 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Aria
 </html>
 """)
 
-# ============================================================
-# ADMIN: AI PROVIDERS
-# ============================================================
 @app.get("/admin/ai")
 async def admin_ai():
     brand = ConfigStore.get("brand_name", "Pocket Lawyer")
@@ -792,9 +789,6 @@ function showMessage(msg, type) {{
 </html>
 """)
 
-# ============================================================
-# ADMIN: TELEGRAM
-# ============================================================
 @app.get("/admin/telegram")
 async def admin_telegram():
     brand = ConfigStore.get("brand_name", "Pocket Lawyer")
@@ -874,9 +868,6 @@ async function saveTelegram() {{
 </html>
 """)
 
-# ============================================================
-# ADMIN: WHATSAPP
-# ============================================================
 @app.get("/admin/whatsapp")
 async def admin_whatsapp():
     brand = ConfigStore.get("brand_name", "Pocket Lawyer")
@@ -956,9 +947,6 @@ async function saveWhatsApp() {{
 </html>
 """)
 
-# ============================================================
-# ADMIN: PLANS
-# ============================================================
 @app.get("/admin/plans")
 async def admin_plans():
     brand = ConfigStore.get("brand_name", "Pocket Lawyer")
@@ -1044,9 +1032,6 @@ async function savePlans() {{
 </html>
 """)
 
-# ============================================================
-# ADMIN: CONFIG
-# ============================================================
 @app.get("/admin/config")
 async def admin_config():
     brand = ConfigStore.get("brand_name", "Pocket Lawyer")
