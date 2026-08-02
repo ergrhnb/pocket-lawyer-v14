@@ -1,0 +1,26 @@
+﻿services:
+  - type: web
+    name: pocket-lawyer-v14
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: SAMBANOVA_API_KEY
+        sync: false
+      - key: MISTRAL_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_ENABLED
+        value: true
+      - key: PDF_GENERATION
+        value: true
+      - key: DEBUG
+        value: false
+    healthCheckPath: /api/health
+    autoDeploy: true

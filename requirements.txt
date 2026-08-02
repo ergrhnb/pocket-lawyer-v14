@@ -1,0 +1,9 @@
+﻿fastapi
+uvicorn
+httpx
+pydantic
+python-multipart
+reportlab
+bcrypt
+pyjwt
+email-validator
