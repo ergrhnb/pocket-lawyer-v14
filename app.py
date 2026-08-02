@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 # POCKET LAWYER v14.0 - COMPLETE FULL VERSION
 # ============================================================
 import os
@@ -108,14 +108,14 @@ class ConfigStore:
              "features": ["AI Chat", "PDF Analysis", "PDF Generation", "Telegram", "WhatsApp", "Team"], "limits": {"requests": 10000}}
         ],
         "quick_issues": [
-            {"id": "tenancy", "title": "?? Tenancy & Landlord", "icon": "??"},
-            {"id": "employment", "title": "?? Employment Law", "icon": "??"},
-            {"id": "contract", "title": "?? Contracts", "icon": "??"},
-            {"id": "family", "title": "??????????? Family Law", "icon": "???????????"},
-            {"id": "debt", "title": "?? Debt Recovery", "icon": "??"},
-            {"id": "criminal", "title": "?? Criminal Law", "icon": "??"},
-            {"id": "corporate", "title": "?? Corporate Law", "icon": "??"},
-            {"id": "property", "title": "?? Property Law", "icon": "??"}
+            {"id": "tenancy", "title": "🏠 Tenancy & Landlord", "icon": "🏠"},
+            {"id": "employment", "title": "💼 Employment Law", "icon": "💼"},
+            {"id": "contract", "title": "📝 Contracts", "icon": "📝"},
+            {"id": "family", "title": "👨‍👩‍👧‍👦 Family Law", "icon": "👨‍👩‍👧‍👦"},
+            {"id": "debt", "title": "💰 Debt Recovery", "icon": "💰"},
+            {"id": "criminal", "title": "⚖️ Criminal Law", "icon": "⚖️"},
+            {"id": "corporate", "title": "🏢 Corporate Law", "icon": "🏢"},
+            {"id": "property", "title": "🏡 Property Law", "icon": "🏡"}
         ]
     }
 
@@ -249,18 +249,18 @@ def get_greeting_response(brand):
     return f"""Welcome to {brand} - Your Nigerian Law AI Assistant
 
 I can help with:
-� ?? Generate PDF documents
-� ?? Analyze uploaded PDF documents
-� ?? Answer legal questions
-� ?? Create contracts and agreements
-� ?? Upload PDFs for AI analysis
+• 📄 Generate PDF documents
+• 📑 Analyze uploaded PDF documents
+• ⚖️ Answer legal questions
+• 📝 Create contracts and agreements
+• 📤 Upload PDFs for AI analysis
 
 Try asking:
-� "Generate a tenancy agreement PDF"
-� "Analyze this contract"
-� "What are tenant rights in Lagos?"
+• "Generate a tenancy agreement PDF"
+• "Analyze this contract"
+• "What are tenant rights in Lagos?"
 
-?? You can upload PDF documents for AI analysis!
+📤 You can upload PDF documents for AI analysis!
 
 Disclaimer: I provide general guidance only. For specific legal advice, please consult a qualified lawyer."""
 
@@ -760,9 +760,9 @@ async def process_telegram_message(text, brand):
     if any(word in text.lower() for word in pdf_keywords):
         result = await generate_document_from_chat(text)
         if result.get("status") == "success":
-            return f"?? Document generated: {result.get('title')}\n\nTo download: https://pocket-lawyer-v14.onrender.com/api/documents/{result.get('document_id')}/download"
+            return f"📄 Document generated: {result.get('title')}\n\nTo download: https://pocket-lawyer-v14.onrender.com/api/documents/{result.get('document_id')}/download"
         else:
-            return f"? Failed to generate PDF: {result.get('message', 'Unknown error')}"
+            return f"❌ Failed to generate PDF: {result.get('message', 'Unknown error')}"
     
     # Regular AI response
     result = await get_ai_response([{"role": "user", "content": text}])
@@ -789,9 +789,9 @@ async def test_telegram(request: TelegramTestRequest):
         elif "generate" in message.lower() or "pdf" in message.lower():
             result = await generate_document_from_chat(message)
             if result.get("status") == "success":
-                reply = f"?? Document generated: {result.get('title')}\n\nTo download: https://pocket-lawyer-v14.onrender.com/api/documents/{result.get('document_id')}/download"
+                reply = f"📄 Document generated: {result.get('title')}\n\nTo download: https://pocket-lawyer-v14.onrender.com/api/documents/{result.get('document_id')}/download"
             else:
-                reply = f"? Failed to generate PDF: {result.get('message', 'Unknown error')}"
+                reply = f"❌ Failed to generate PDF: {result.get('message', 'Unknown error')}"
         else:
             result = await get_ai_response([{"role": "user", "content": message}])
             reply = result["reply"]
@@ -828,9 +828,9 @@ async def test_whatsapp(request: WhatsAppTestRequest):
         elif "generate" in message.lower() or "pdf" in message.lower():
             result = await generate_document_from_chat(message)
             if result.get("status") == "success":
-                reply = f"?? Document generated: {result.get('title')}\n\nTo download: https://pocket-lawyer-v14.onrender.com/api/documents/{result.get('document_id')}/download"
+                reply = f"📄 Document generated: {result.get('title')}\n\nTo download: https://pocket-lawyer-v14.onrender.com/api/documents/{result.get('document_id')}/download"
             else:
-                reply = f"? Failed to generate PDF: {result.get('message', 'Unknown error')}"
+                reply = f"❌ Failed to generate PDF: {result.get('message', 'Unknown error')}"
         else:
             result = await get_ai_response([{"role": "user", "content": message}])
             reply = result["reply"]
@@ -879,9 +879,9 @@ async def whatsapp_webhook(request: Request):
         elif "generate" in text.lower() or "pdf" in text.lower():
             result = await generate_document_from_chat(text)
             if result.get("status") == "success":
-                reply = f"?? Document generated: {result.get('title')}\n\nTo download: https://pocket-lawyer-v14.onrender.com/api/documents/{result.get('document_id')}/download"
+                reply = f"📄 Document generated: {result.get('title')}\n\nTo download: https://pocket-lawyer-v14.onrender.com/api/documents/{result.get('document_id')}/download"
             else:
-                reply = f"? Failed to generate PDF: {result.get('message', 'Unknown error')}"
+                reply = f"❌ Failed to generate PDF: {result.get('message', 'Unknown error')}"
         else:
             result = await get_ai_response([{"role": "user", "content": text}])
             reply = result["reply"]
@@ -936,9 +936,9 @@ async def telegram_webhook(request: Request):
         elif "generate" in text.lower() or "pdf" in text.lower():
             result = await generate_document_from_chat(text)
             if result.get("status") == "success":
-                reply = f"?? Document generated: {result.get('title')}\n\nTo download: https://pocket-lawyer-v14.onrender.com/api/documents/{result.get('document_id')}/download"
+                reply = f"📄 Document generated: {result.get('title')}\n\nTo download: https://pocket-lawyer-v14.onrender.com/api/documents/{result.get('document_id')}/download"
             else:
-                reply = f"? Failed to generate PDF: {result.get('message', 'Unknown error')}"
+                reply = f"❌ Failed to generate PDF: {result.get('message', 'Unknown error')}"
         else:
             result = await get_ai_response([{"role": "user", "content": text}])
             reply = result["reply"]
@@ -962,8 +962,8 @@ async def telegram_webhook(request: Request):
 @app.on_event("startup")
 async def startup():
     logger.info(f"Starting {APP_NAME} v{VERSION}")
-    logger.info(f"PDF Generation: {'?' if PDF_AVAILABLE else '?'}")
-    logger.info(f"PDF Reader: {'?' if PDF_READER_AVAILABLE else '?'}")
+    logger.info(f"PDF Generation: {'✅' if PDF_AVAILABLE else '❌'}")
+    logger.info(f"PDF Reader: {'✅' if PDF_READER_AVAILABLE else '❌'}")
     start_telegram_polling()
 
 @app.on_event("shutdown")
@@ -1018,34 +1018,34 @@ async def home():
 </head>
 <body>
 <div class="header">
-    <div><h1>?? {brand}</h1><div style="color:#94a3b8;font-size:0.9rem;">AI Legal Assistant for Nigerian Law</div></div>
-    <div><a href="/chat" class="btn btn-primary">?? Chat</a><a href="/admin" class="btn btn-secondary">?? Admin</a></div>
+    <div><h1>⚖️ {brand}</h1><div style="color:#94a3b8;font-size:0.9rem;">AI Legal Assistant for Nigerian Law</div></div>
+    <div><a href="/chat" class="btn btn-primary">💬 Chat</a><a href="/admin" class="btn btn-secondary">⚙️ Admin</a></div>
 </div>
 <div class="container">
     <div class="hero">
-        <h1>???? Nigerian Law, Powered by AI</h1>
+        <h1>🇳🇬 Nigerian Law, Powered by AI</h1>
         <p>Get instant legal guidance, generate documents, and analyze contracts</p>
-        <div><span class="badge">?? PDF Generation</span><span class="badge">?? Document Analysis</span><span class="badge">?? Nigerian Law</span></div>
-        <div style="margin-top:20px;"><a href="/chat" class="btn btn-primary">?? Start Chat</a><a href="#upload" class="btn btn-success">?? Upload PDF</a></div>
+        <div><span class="badge">📄 PDF Generation</span><span class="badge">🔍 Document Analysis</span><span class="badge">⚖️ Nigerian Law</span></div>
+        <div style="margin-top:20px;"><a href="/chat" class="btn btn-primary">💬 Start Chat</a><a href="#upload" class="btn btn-success">📤 Upload PDF</a></div>
     </div>
     <div class="features">
-        <div class="feature"><div class="icon">??</div><h3>Generate PDFs</h3><p>Create legal documents and contracts</p></div>
-        <div class="feature"><div class="icon">??</div><h3>Analyze Documents</h3><p>Upload PDFs for AI analysis</p></div>
-        <div class="feature"><div class="icon">??</div><h3>AI Chat</h3><p>Get instant legal answers</p></div>
-        <div class="feature"><div class="icon">??</div><h3>Telegram & WhatsApp</h3><p>Chat on your favorite platforms</p></div>
+        <div class="feature"><div class="icon">📄</div><h3>Generate PDFs</h3><p>Create legal documents and contracts</p></div>
+        <div class="feature"><div class="icon">🔍</div><h3>Analyze Documents</h3><p>Upload PDFs for AI analysis</p></div>
+        <div class="feature"><div class="icon">💬</div><h3>AI Chat</h3><p>Get instant legal answers</p></div>
+        <div class="feature"><div class="icon">🤖</div><h3>Telegram & WhatsApp</h3><p>Chat on your favorite platforms</p></div>
     </div>
     <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-        <div class="icon">??</div>
+        <div class="icon">📤</div>
         <h3>Upload PDF Document</h3>
         <p>Upload a PDF for AI analysis and review</p>
         <input type="file" id="fileInput" accept=".pdf" onchange="uploadPDF(this)">
         <div id="uploadStatus" style="margin-top:12px;color:#94a3b8;"></div>
     </div>
     <div id="issuesContainer" style="margin:24px 0;">
-        <h2>?? Quick Legal Issues</h2>
+        <h2>📌 Quick Legal Issues</h2>
         <div class="issues-grid" id="issuesGrid"></div>
     </div>
-    <div class="footer"><p>?? {brand} v{VERSION} � General guidance only</p></div>
+    <div class="footer"><p>⚖️ {brand} v{VERSION} • General guidance only</p></div>
 </div>
 <script>
 const issues = {json.dumps(ConfigStore.get_quick_issues())};
@@ -1063,13 +1063,13 @@ async function uploadPDF(input) {{
     const formData = new FormData();
     formData.append('file', file);
     const status = document.getElementById('uploadStatus');
-    status.textContent = '? Uploading...';
+    status.textContent = '⏳ Uploading...';
     status.style.color = '#fbbf24';
     try {{
         const res = await fetch('/api/documents/upload', {{ method: 'POST', body: formData }});
         const data = await res.json();
         if (data.status === 'success') {{
-            status.textContent = `? Uploaded: ${{data.filename}} (${{data.words}} words)`;
+            status.textContent = `✅ Uploaded: ${{data.filename}} (${{data.words}} words)`;
             status.style.color = '#10b981';
             const analyze = confirm('Document uploaded! Analyze it now?');
             if (analyze) {{
@@ -1080,15 +1080,15 @@ async function uploadPDF(input) {{
                 }});
                 const data2 = await res2.json();
                 if (data2.status === 'success') {{
-                    alert('?? Analysis:\\n\\n' + data2.analysis);
+                    alert('📄 Analysis:\\n\\n' + data2.analysis);
                 }}
             }}
         }} else {{
-            status.textContent = `? ${{data.message}}`;
+            status.textContent = `❌ ${{data.message}}`;
             status.style.color = '#ef4444';
         }}
     }} catch(e) {{
-        status.textContent = `? Error: ${{e.message}}`;
+        status.textContent = `❌ Error: ${{e.message}}`;
         status.style.color = '#ef4444';
     }}
     input.value = '';
@@ -1150,9 +1150,9 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Aria
 <div class="stats-grid">
 <div class="stat-card"><div class="stat-value">{len([p for p in providers if p.get("enabled")])}/{len(providers)}</div><div class="stat-label">Active Providers</div></div>
 <div class="stat-card"><div class="stat-value">{len(plans)}</div><div class="stat-label">Plans</div></div>
-<div class="stat-card"><div class="stat-value">{"?" if tg.get("enabled") else "?"}</div><div class="stat-label">Telegram</div></div>
-<div class="stat-card"><div class="stat-value">{"?" if wa.get("enabled") else "?"}</div><div class="stat-label">WhatsApp</div></div>
-<div class="stat-card"><div class="stat-value">{"?" if PDF_AVAILABLE else "?"}</div><div class="stat-label">PDF Generation</div></div>
+<div class="stat-card"><div class="stat-value">{"✅" if tg.get("enabled") else "❌"}</div><div class="stat-label">Telegram</div></div>
+<div class="stat-card"><div class="stat-value">{"✅" if wa.get("enabled") else "❌"}</div><div class="stat-label">WhatsApp</div></div>
+<div class="stat-card"><div class="stat-value">{"✅" if PDF_AVAILABLE else "❌"}</div><div class="stat-label">PDF Generation</div></div>
 <div class="stat-card"><div class="stat-value">v{VERSION}</div><div class="stat-label">Version</div></div>
 </div>
 <div class="card"><h3>Quick Actions</h3>
@@ -1238,14 +1238,14 @@ async function testProvider(idx) {{
         }});
         const data = await res.json();
         if (data.status === 'success') {{
-            span.textContent = '? ' + data.response;
+            span.textContent = '✅ ' + data.response;
             span.style.color = '#10b981';
         }} else {{
-            span.textContent = '? ' + data.response;
+            span.textContent = '❌ ' + data.response;
             span.style.color = '#ef4444';
         }}
     }} catch(e) {{
-        span.textContent = '? Error';
+        span.textContent = '❌ Error';
         span.style.color = '#ef4444';
     }}
 }}
@@ -1303,14 +1303,14 @@ label {{ color:#94a3b8; display:block; margin-bottom:4px; font-size:0.9rem; }}
 <div class="main">
 <h1>Telegram Settings</h1>
 <div class="card">
-<h3>Status: <span class="status-{"on" if tg.get("enabled") else "off"}">{"?? Enabled" if tg.get("enabled") else "?? Disabled"}</span></h3>
+<h3>Status: <span class="status-{"on" if tg.get("enabled") else "off"}">{"🟢 Enabled" if tg.get("enabled") else "🔴 Disabled"}</span></h3>
 <div class="grid-2">
 <div><label>Bot Token</label><input type="text" id="bot_token" class="input-field" value="{tg.get('bot_token', '')}"></div>
 <div><label>Bot Username</label><input type="text" id="bot_username" class="input-field" value="{tg.get('bot_username', '')}"></div>
 </div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-<button class="btn btn-primary" onclick="saveTelegram()">?? Save</button>
-<button class="btn btn-success" onclick="toggleTelegram()">{"?? Disable" if tg.get("enabled") else "?? Enable"}</button>
+<button class="btn btn-primary" onclick="saveTelegram()">💾 Save</button>
+<button class="btn btn-success" onclick="toggleTelegram()">{"🔴 Disable" if tg.get("enabled") else "🟢 Enable"}</button>
 </div>
 <div id="tg_msg" style="margin-top:12px;padding:12px;border-radius:8px;display:none;"></div>
 </div>
@@ -1320,7 +1320,7 @@ label {{ color:#94a3b8; display:block; margin-bottom:4px; font-size:0.9rem; }}
 <div><label>Chat ID</label><input type="text" id="test_chat_id" class="input-field" placeholder="Enter your chat ID"></div>
 <div><label>Message</label><input type="text" id="test_message" class="input-field" value="Hello from {brand}! Try: 'Generate a PDF'"></div>
 </div>
-<button class="btn btn-success" onclick="testTelegram()">?? Send Test</button>
+<button class="btn btn-success" onclick="testTelegram()">📤 Send Test</button>
 <div id="test_result" style="margin-top:12px;padding:12px;border-radius:8px;display:none;"></div>
 </div>
 </div>
@@ -1337,13 +1337,13 @@ async function saveTelegram() {{
         msg.style.display = 'block';
         msg.style.background = data.status === 'success' ? '#10b98120' : '#ef444420';
         msg.style.color = data.status === 'success' ? '#10b981' : '#ef4444';
-        msg.textContent = data.status === 'success' ? '? Saved!' : '? Failed';
+        msg.textContent = data.status === 'success' ? '✅ Saved!' : '❌ Failed';
         if (data.status === 'success') setTimeout(() => location.reload(), 1000);
     }} catch(e) {{
         msg.style.display = 'block';
         msg.style.background = '#ef444420';
         msg.style.color = '#ef4444';
-        msg.textContent = '? Error: ' + e.message;
+        msg.textContent = '❌ Error: ' + e.message;
     }}
 }}
 async function toggleTelegram() {{
@@ -1367,11 +1367,11 @@ async function testTelegram() {{
         result.style.display = 'block';
         result.style.background = '#ef444420';
         result.style.color = '#ef4444';
-        result.textContent = '? Chat ID required';
+        result.textContent = '❌ Chat ID required';
         return;
     }}
     result.style.display = 'block';
-    result.textContent = '? Sending...';
+    result.textContent = '⏳ Sending...';
     result.style.background = '#0f172a';
     result.style.color = '#fbbf24';
     try {{
@@ -1383,11 +1383,11 @@ async function testTelegram() {{
         const data = await res.json();
         result.style.background = data.status === 'success' ? '#10b98120' : '#ef444420';
         result.style.color = data.status === 'success' ? '#10b981' : '#ef4444';
-        result.textContent = data.status === 'success' ? '? Message sent!' : '? ' + data.message;
+        result.textContent = data.status === 'success' ? '✅ Message sent!' : '❌ ' + data.message;
     }} catch(e) {{
         result.style.background = '#ef444420';
         result.style.color = '#ef4444';
-        result.textContent = '? Error: ' + e.message;
+        result.textContent = '❌ Error: ' + e.message;
     }}
 }}
 </script>
@@ -1444,15 +1444,15 @@ label {{ color:#94a3b8; display:block; margin-bottom:4px; font-size:0.9rem; }}
 <div class="main">
 <h1>WhatsApp Settings</h1>
 <div class="card">
-<h3>Status: <span class="status-{"on" if wa.get("enabled") else "off"}">{"?? Enabled" if wa.get("enabled") else "?? Disabled"}</span></h3>
+<h3>Status: <span class="status-{"on" if wa.get("enabled") else "off"}">{"🟢 Enabled" if wa.get("enabled") else "🔴 Disabled"}</span></h3>
 <div class="grid-2">
 <div><label>Phone Number ID</label><input type="text" id="wa_phone" class="input-field" value="{wa.get('phone_number_id', '')}"></div>
 <div><label>Access Token</label><input type="password" id="wa_token" class="input-field" value="{wa.get('access_token', '')}"></div>
 </div>
 <div><label>Verify Token</label><input type="text" id="wa_verify" class="input-field" value="{wa.get('verify_token', 'pocket_lawyer_2024')}"></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-<button class="btn btn-primary" onclick="saveWhatsApp()">?? Save</button>
-<button class="btn btn-success" onclick="toggleWhatsApp()">{"?? Disable" if wa.get("enabled") else "?? Enable"}</button>
+<button class="btn btn-primary" onclick="saveWhatsApp()">💾 Save</button>
+<button class="btn btn-success" onclick="toggleWhatsApp()">{"🔴 Disable" if wa.get("enabled") else "🟢 Enable"}</button>
 </div>
 <div id="wa_msg" style="margin-top:12px;padding:12px;border-radius:8px;display:none;"></div>
 </div>
@@ -1462,7 +1462,7 @@ label {{ color:#94a3b8; display:block; margin-bottom:4px; font-size:0.9rem; }}
 <div><label>Phone Number</label><input type="text" id="wa_test_to" class="input-field" placeholder="e.g., 2348012345678"></div>
 <div><label>Message</label><input type="text" id="wa_test_msg" class="input-field" value="Hello from {brand}! Try: 'Generate a PDF'"></div>
 </div>
-<button class="btn btn-success" onclick="testWhatsApp()">?? Send Test</button>
+<button class="btn btn-success" onclick="testWhatsApp()">📤 Send Test</button>
 <div id="wa_test_result" style="margin-top:12px;padding:12px;border-radius:8px;display:none;"></div>
 </div>
 </div>
@@ -1479,12 +1479,12 @@ async function saveWhatsApp() {{
         msg.style.display = 'block';
         msg.style.background = data.status === 'success' ? '#10b98120' : '#ef444420';
         msg.style.color = data.status === 'success' ? '#10b981' : '#ef4444';
-        msg.textContent = data.status === 'success' ? '? Saved!' : '? Failed';
+        msg.textContent = data.status === 'success' ? '✅ Saved!' : '❌ Failed';
     }} catch(e) {{
         msg.style.display = 'block';
         msg.style.background = '#ef444420';
         msg.style.color = '#ef4444';
-        msg.textContent = '? Error: ' + e.message;
+        msg.textContent = '❌ Error: ' + e.message;
     }}
 }}
 async function toggleWhatsApp() {{
@@ -1508,11 +1508,11 @@ async function testWhatsApp() {{
         result.style.display = 'block';
         result.style.background = '#ef444420';
         result.style.color = '#ef4444';
-        result.textContent = '? Phone number required';
+        result.textContent = '❌ Phone number required';
         return;
     }}
     result.style.display = 'block';
-    result.textContent = '? Sending...';
+    result.textContent = '⏳ Sending...';
     result.style.background = '#0f172a';
     result.style.color = '#fbbf24';
     try {{
@@ -1524,11 +1524,11 @@ async function testWhatsApp() {{
         const data = await res.json();
         result.style.background = data.status === 'success' ? '#10b98120' : '#ef444420';
         result.style.color = data.status === 'success' ? '#10b981' : '#ef4444';
-        result.textContent = data.status === 'success' ? '? Message sent!' : '? ' + data.message;
+        result.textContent = data.status === 'success' ? '✅ Message sent!' : '❌ ' + data.message;
     }} catch(e) {{
         result.style.background = '#ef444420';
         result.style.color = '#ef4444';
-        result.textContent = '? Error: ' + e.message;
+        result.textContent = '❌ Error: ' + e.message;
     }}
 }}
 </script>
@@ -1549,7 +1549,7 @@ async def admin_plans():
         <div style="background:#1e293b;padding:16px 20px;border-radius:10px;border:1px solid #334155;margin-bottom:12px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
                 <div><strong style="font-size:1.1rem;">{p.get('name')}</strong><br><span style="color:#94a3b8;font-size:0.8rem;">{', '.join(p.get('features', []))}</span></div>
-                <div style="text-align:right;"><span style="font-size:1.2rem;color:#60a5fa;">?{p.get('price_monthly')}</span><br><span style="color:#94a3b8;font-size:0.7rem;">/month</span></div>
+                <div style="text-align:right;"><span style="font-size:1.2rem;color:#60a5fa;">₦{p.get('price_monthly')}</span><br><span style="color:#94a3b8;font-size:0.7rem;">/month</span></div>
             </div>
         </div>
         """
@@ -1609,13 +1609,13 @@ async function savePlans() {{
         msg.style.display = 'block';
         msg.style.background = data.status === 'success' ? '#10b98120' : '#ef444420';
         msg.style.color = data.status === 'success' ? '#10b981' : '#ef4444';
-        msg.textContent = data.status === 'success' ? '? Plans saved!' : '? Failed';
+        msg.textContent = data.status === 'success' ? '✅ Plans saved!' : '❌ Failed';
         if (data.status === 'success') setTimeout(() => location.reload(), 1000);
     }} catch(e) {{
         msg.style.display = 'block';
         msg.style.background = '#ef444420';
         msg.style.color = '#ef4444';
-        msg.textContent = '? Error: ' + e.message;
+        msg.textContent = '❌ Error: ' + e.message;
     }}
 }}
 </script>
@@ -1696,13 +1696,13 @@ async function saveConfig() {{
         msg.style.display = 'block';
         msg.style.background = data.status === 'success' ? '#10b98120' : '#ef444420';
         msg.style.color = data.status === 'success' ? '#10b981' : '#ef4444';
-        msg.textContent = data.status === 'success' ? '? Saved!' : '? Failed';
+        msg.textContent = data.status === 'success' ? '✅ Saved!' : '❌ Failed';
         if (data.status === 'success') setTimeout(() => location.reload(), 1000);
     }} catch(e) {{
         msg.style.display = 'block';
         msg.style.background = '#ef444420';
         msg.style.color = '#ef4444';
-        msg.textContent = '? Error: ' + e.message;
+        msg.textContent = '❌ Error: ' + e.message;
     }}
 }}
 </script>
