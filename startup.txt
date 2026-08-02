@@ -1,0 +1,6 @@
+﻿# ============================================================
+# RENDER STARTUP COMMAND
+# ============================================================
+# Copy this into Render's "Start Command" field
+
+uvicorn app:app --host 0.0.0.0 --port $PORT --workers 1
