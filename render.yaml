@@ -1,11 +1,15 @@
 ﻿services:
   - type: web
     name: pocket-lawyer-v14
-    runtime: docker
+    runtime: python
+    repo: https://github.com/ergrhnb/pocket-lawyer-v14
     plan: free
     region: oregon
-    dockerfilePath: ./Dockerfile
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
       - key: GROQ_API_KEY
         sync: false
       - key: SAMBANOVA_API_KEY
@@ -16,11 +20,3 @@
         sync: false
       - key: TELEGRAM_BOT_TOKEN
         sync: false
-      - key: TELEGRAM_ENABLED
-        value: true
-      - key: PDF_GENERATION
-        value: true
-      - key: DEBUG
-        value: false
-    healthCheckPath: /api/health
-    autoDeploy: true
