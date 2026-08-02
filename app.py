@@ -1,5 +1,5 @@
 ﻿# ============================================================
-# POCKET LAWYER v14.0 - COMPLETE FULL VERSION
+# POCKET LAWYER v14.0 - COMPLETE FIXED VERSION
 # ============================================================
 import os
 import json
@@ -57,7 +57,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("pocket_lawyer")
 
-VERSION = "14.0.0"
+VERSION = "14.0.1"
 APP_NAME = "Pocket Lawyer"
 
 # ============================================================
@@ -972,11 +972,23 @@ async def shutdown():
     logger.info("Shutting down")
 
 # ============================================================
-# UI PAGES (Simplified - Home, Chat, Admin)
+# HOME PAGE - FIXED VERSION
 # ============================================================
 @app.get("/")
 async def home():
     brand = ConfigStore.get("brand_name", "Pocket Lawyer")
+    issues = ConfigStore.get_quick_issues()
+    
+    # Build issues HTML
+    issues_html = ""
+    for issue in issues:
+        issues_html += f'''
+        <div class="issue-card" onclick="window.location.href='/chat?q={issue["title"]}'">
+            <div class="issue-icon">{issue["icon"]}</div>
+            <div class="issue-title">{issue["title"]}</div>
+        </div>
+        '''
+    
     return HTMLResponse(f"""
 <!DOCTYPE html>
 <html>
@@ -1012,6 +1024,8 @@ async def home():
         .issues-grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin: 16px 0; }}
         .issue-card {{ background: #1e293b; padding: 16px 20px; border-radius: 10px; border: 1px solid #334155; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.3s; }}
         .issue-card:hover {{ border-color: #60a5fa; transform: translateX(4px); background: #253450; }}
+        .issue-icon {{ font-size: 1.5rem; }}
+        .issue-title {{ color: #e2e8f0; }}
         .footer {{ text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 32px; padding-top: 16px; border-top: 1px solid #1e293b; }}
         @media (max-width: 768px) {{ .header {{ flex-direction: column; text-align: center; }} .hero h1 {{ font-size: 2rem; }} }}
     </style>
@@ -1043,20 +1057,13 @@ async def home():
     </div>
     <div id="issuesContainer" style="margin:24px 0;">
         <h2>📌 Quick Legal Issues</h2>
-        <div class="issues-grid" id="issuesGrid"></div>
+        <div class="issues-grid">
+            {issues_html}
+        </div>
     </div>
     <div class="footer"><p>⚖️ {brand} v{VERSION} • General guidance only</p></div>
 </div>
 <script>
-const issues = {json.dumps(ConfigStore.get_quick_issues())};
-const issuesGrid = document.getElementById('issuesGrid');
-issues.forEach(issue => {{
-    const card = document.createElement('div');
-    card.className = 'issue-card';
-    card.innerHTML = `<div class="issue-icon">${{issue.icon}}</div><div class="issue-title">${{issue.title}}</div>`;
-    card.onclick = () => window.location.href = `/chat?q=${encodeURIComponent(issue.title)}`;
-    issuesGrid.appendChild(card);
-}});
 async function uploadPDF(input) {{
     if (!input.files || input.files.length === 0) return;
     const file = input.files[0];
