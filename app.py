@@ -1,5 +1,5 @@
 ﻿# ============================================================
-# POCKET LAWYER v14.0 - FIXED VERSION
+# POCKET LAWYER v14.0 - COMPLETE FULL VERSION
 # ============================================================
 import os
 import json
@@ -13,7 +13,7 @@ import hashlib
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import httpx
@@ -54,7 +54,7 @@ VERSION = "14.0.0"
 APP_NAME = "Pocket Lawyer"
 
 # ============================================================
-# CONFIGURATION - FIXED SYNTAX
+# CONFIGURATION
 # ============================================================
 class ConfigStore:
     _config = {
@@ -484,12 +484,12 @@ async def health():
     }
 
 # ============================================================
-# UI PAGES
+# UI PAGES - COMPLETE
 # ============================================================
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 async def home():
     brand = ConfigStore.get("brand_name", "Pocket Lawyer")
-    return f"""
+    return HTMLResponse(f"""
 <!DOCTYPE html>
 <html>
 <head><title>{brand}</title>
@@ -514,12 +514,12 @@ h1 {{ color: #60a5fa; font-size: 3.5rem; }}
 <div class="version">v{VERSION} • PDF Generation Available</div>
 </body>
 </html>
-"""
+""")
 
-@app.get("/chat", response_class=HTMLResponse)
+@app.get("/chat")
 async def chat_ui():
     brand = ConfigStore.get("brand_name", "Pocket Lawyer")
-    return f"""
+    return HTMLResponse(f"""
 <!DOCTYPE html>
 <html>
 <head><title>{brand} - Chat</title>
@@ -610,9 +610,12 @@ async function sendMessage() {{
 </script>
 </body>
 </html>
-"""
+""")
 
-@app.get("/admin", response_class=HTMLResponse)
+# ============================================================
+# ADMIN DASHBOARD
+# ============================================================
+@app.get("/admin")
 async def admin_dashboard():
     brand = ConfigStore.get("brand_name", "Pocket Lawyer")
     providers = ConfigStore.get_ai_providers()
@@ -621,7 +624,7 @@ async def admin_dashboard():
     wa = ConfigStore.get_whatsapp()
     stats = ProviderRotator.get_stats()
 
-    return f"""
+    return HTMLResponse(f"""
 <!DOCTYPE html>
 <html>
 <head><title>{brand} - Admin</title>
@@ -681,9 +684,12 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Aria
 </div>
 </body>
 </html>
-"""
+""")
 
-@app.get("/admin/ai", response_class=HTMLResponse)
+# ============================================================
+# ADMIN: AI PROVIDERS
+# ============================================================
+@app.get("/admin/ai")
 async def admin_ai():
     brand = ConfigStore.get("brand_name", "Pocket Lawyer")
     providers = ConfigStore.get_ai_providers()
@@ -695,7 +701,7 @@ async def admin_ai():
             <div><button class="btn btn-primary" onclick="toggleProvider({idx})">Toggle</button> <button class="btn btn-secondary" onclick="testProvider({idx})">Test</button> <span id="test_result_{idx}"></span></div>
         </div>
         """
-    return f"""
+    return HTMLResponse(f"""
 <!DOCTYPE html>
 <html>
 <head><title>{brand} - AI Providers</title>
@@ -784,7 +790,447 @@ function showMessage(msg, type) {{
 </script>
 </body>
 </html>
-"""
+""")
+
+# ============================================================
+# ADMIN: TELEGRAM
+# ============================================================
+@app.get("/admin/telegram")
+async def admin_telegram():
+    brand = ConfigStore.get("brand_name", "Pocket Lawyer")
+    tg = ConfigStore.get_telegram()
+    return HTMLResponse(f"""
+<!DOCTYPE html>
+<html>
+<head><title>{brand} - Telegram</title>
+<style>
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }}
+.sidebar {{ width:220px; background:#0f172a; border-right:1px solid #1e293b; padding:24px 16px; position:fixed; top:0; left:0; bottom:0; overflow-y:auto; }}
+.sidebar h2 {{ color:#60a5fa; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid #1e293b; }}
+.sidebar a {{ display:block; padding:10px 14px; color:#94a3b8; text-decoration:none; border-radius:8px; margin-bottom:2px; }}
+.sidebar a:hover {{ background:#1e293b; color:#e2e8f0; }}
+.sidebar a.active {{ background:#1e293b; color:#60a5fa; }}
+.main {{ margin-left:220px; padding:32px 40px; flex:1; }}
+.main h1 {{ font-size:2rem; margin-bottom:24px; }}
+.card {{ background:#1e293b; padding:24px; border-radius:12px; border:1px solid #334155; margin-bottom:20px; }}
+.card h3 {{ margin-bottom:12px; }}
+.btn {{ padding:8px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer; }}
+.btn-primary {{ background:#3b82f6; color:white; }}
+.btn-primary:hover {{ background:#2563eb; }}
+.btn-success {{ background:#10b981; color:white; }}
+.btn-success:hover {{ background:#059669; }}
+.input-field {{ background:#0f172a; color:#e2e8f0; border:1px solid #334155; border-radius:6px; padding:8px 12px; width:100%; margin-bottom:8px; }}
+.grid-2 {{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }}
+label {{ color:#94a3b8; display:block; margin-bottom:4px; font-size:0.9rem; }}
+</style>
+</head>
+<body>
+<div class="sidebar">
+<h2> {brand}</h2>
+<a href="/admin">Dashboard</a>
+<a href="/admin/ai">AI</a>
+<a href="/admin/telegram" class="active">Telegram</a>
+<a href="/admin/whatsapp">WhatsApp</a>
+<a href="/admin/plans">Plans</a>
+<a href="/admin/config">Config</a>
+</div>
+<div class="main">
+<h1>Telegram Settings</h1>
+<div class="card">
+<h3>Bot Configuration</h3>
+<div class="grid-2">
+<div><label>Bot Token</label><input type="text" id="bot_token" class="input-field" value="{tg.get('bot_token', '')}"></div>
+<div><label>Bot Username</label><input type="text" id="bot_username" class="input-field" value="{tg.get('bot_username', '')}"></div>
+</div>
+<button class="btn btn-primary" onclick="saveTelegram()">Save</button>
+<div id="tg_msg" style="margin-top:12px;padding:12px;border-radius:8px;display:none;"></div>
+</div>
+</div>
+<script>
+async function saveTelegram() {{
+    const msg = document.getElementById('tg_msg');
+    try {{
+        const res = await fetch('/api/config/batch', {{
+            method: 'POST',
+            headers: {{'Content-Type': 'application/json'}},
+            body: JSON.stringify({{configs: {{telegram: {{enabled: true, bot_token: document.getElementById('bot_token').value, bot_username: document.getElementById('bot_username').value}}}}}})
+        }});
+        const data = await res.json();
+        msg.style.display = 'block';
+        msg.style.background = data.status === 'success' ? '#10b98120' : '#ef444420';
+        msg.style.color = data.status === 'success' ? '#10b981' : '#ef4444';
+        msg.textContent = data.status === 'success' ? 'Saved!' : 'Failed';
+        if (data.status === 'success') setTimeout(() => location.reload(), 1000);
+    }} catch(e) {{
+        msg.style.display = 'block';
+        msg.style.background = '#ef444420';
+        msg.style.color = '#ef4444';
+        msg.textContent = 'Error: ' + e.message;
+    }}
+}}
+</script>
+</body>
+</html>
+""")
+
+# ============================================================
+# ADMIN: WHATSAPP
+# ============================================================
+@app.get("/admin/whatsapp")
+async def admin_whatsapp():
+    brand = ConfigStore.get("brand_name", "Pocket Lawyer")
+    wa = ConfigStore.get_whatsapp()
+    return HTMLResponse(f"""
+<!DOCTYPE html>
+<html>
+<head><title>{brand} - WhatsApp</title>
+<style>
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }}
+.sidebar {{ width:220px; background:#0f172a; border-right:1px solid #1e293b; padding:24px 16px; position:fixed; top:0; left:0; bottom:0; overflow-y:auto; }}
+.sidebar h2 {{ color:#60a5fa; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid #1e293b; }}
+.sidebar a {{ display:block; padding:10px 14px; color:#94a3b8; text-decoration:none; border-radius:8px; margin-bottom:2px; }}
+.sidebar a:hover {{ background:#1e293b; color:#e2e8f0; }}
+.sidebar a.active {{ background:#1e293b; color:#60a5fa; }}
+.main {{ margin-left:220px; padding:32px 40px; flex:1; }}
+.main h1 {{ font-size:2rem; margin-bottom:24px; }}
+.card {{ background:#1e293b; padding:24px; border-radius:12px; border:1px solid #334155; margin-bottom:20px; }}
+.card h3 {{ margin-bottom:12px; }}
+.btn {{ padding:8px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer; }}
+.btn-primary {{ background:#3b82f6; color:white; }}
+.btn-primary:hover {{ background:#2563eb; }}
+.btn-success {{ background:#10b981; color:white; }}
+.btn-success:hover {{ background:#059669; }}
+.input-field {{ background:#0f172a; color:#e2e8f0; border:1px solid #334155; border-radius:6px; padding:8px 12px; width:100%; margin-bottom:8px; }}
+.grid-2 {{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }}
+label {{ color:#94a3b8; display:block; margin-bottom:4px; font-size:0.9rem; }}
+</style>
+</head>
+<body>
+<div class="sidebar">
+<h2> {brand}</h2>
+<a href="/admin">Dashboard</a>
+<a href="/admin/ai">AI</a>
+<a href="/admin/telegram">Telegram</a>
+<a href="/admin/whatsapp" class="active">WhatsApp</a>
+<a href="/admin/plans">Plans</a>
+<a href="/admin/config">Config</a>
+</div>
+<div class="main">
+<h1>WhatsApp Settings</h1>
+<div class="card">
+<h3>Configuration</h3>
+<div class="grid-2">
+<div><label>Phone Number ID</label><input type="text" id="wa_phone" class="input-field" value="{wa.get('phone_number_id', '')}"></div>
+<div><label>Access Token</label><input type="password" id="wa_token" class="input-field" value="{wa.get('access_token', '')}"></div>
+</div>
+<div><label>Verify Token</label><input type="text" id="wa_verify" class="input-field" value="{wa.get('verify_token', 'pocket_lawyer_2024')}"></div>
+<button class="btn btn-primary" onclick="saveWhatsApp()">Save</button>
+<div id="wa_msg" style="margin-top:12px;padding:12px;border-radius:8px;display:none;"></div>
+</div>
+</div>
+<script>
+async function saveWhatsApp() {{
+    const msg = document.getElementById('wa_msg');
+    try {{
+        const res = await fetch('/api/config/batch', {{
+            method: 'POST',
+            headers: {{'Content-Type': 'application/json'}},
+            body: JSON.stringify({{configs: {{whatsapp: {{enabled: true, phone_number_id: document.getElementById('wa_phone').value, access_token: document.getElementById('wa_token').value, verify_token: document.getElementById('wa_verify').value}}}}}})
+        }});
+        const data = await res.json();
+        msg.style.display = 'block';
+        msg.style.background = data.status === 'success' ? '#10b98120' : '#ef444420';
+        msg.style.color = data.status === 'success' ? '#10b981' : '#ef4444';
+        msg.textContent = data.status === 'success' ? 'Saved!' : 'Failed';
+    }} catch(e) {{
+        msg.style.display = 'block';
+        msg.style.background = '#ef444420';
+        msg.style.color = '#ef4444';
+        msg.textContent = 'Error: ' + e.message;
+    }}
+}}
+</script>
+</body>
+</html>
+""")
+
+# ============================================================
+# ADMIN: PLANS
+# ============================================================
+@app.get("/admin/plans")
+async def admin_plans():
+    brand = ConfigStore.get("brand_name", "Pocket Lawyer")
+    plans = ConfigStore.get_plans()
+    html = ""
+    for p in plans:
+        html += f"""
+        <div style="background:#1e293b;padding:16px 20px;border-radius:10px;border:1px solid #334155;margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div><strong style="font-size:1.1rem;">{p.get('name')}</strong><br><span style="color:#94a3b8;font-size:0.8rem;">{', '.join(p.get('features', []))}</span></div>
+                <div style="text-align:right;"><span style="font-size:1.2rem;color:#60a5fa;">₦{p.get('price_monthly')}</span><br><span style="color:#94a3b8;font-size:0.7rem;">/month</span></div>
+            </div>
+        </div>
+        """
+    return HTMLResponse(f"""
+<!DOCTYPE html>
+<html>
+<head><title>{brand} - Plans</title>
+<style>
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }}
+.sidebar {{ width:220px; background:#0f172a; border-right:1px solid #1e293b; padding:24px 16px; position:fixed; top:0; left:0; bottom:0; overflow-y:auto; }}
+.sidebar h2 {{ color:#60a5fa; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid #1e293b; }}
+.sidebar a {{ display:block; padding:10px 14px; color:#94a3b8; text-decoration:none; border-radius:8px; margin-bottom:2px; }}
+.sidebar a:hover {{ background:#1e293b; color:#e2e8f0; }}
+.sidebar a.active {{ background:#1e293b; color:#60a5fa; }}
+.main {{ margin-left:220px; padding:32px 40px; flex:1; }}
+.main h1 {{ font-size:2rem; margin-bottom:24px; }}
+.btn {{ padding:8px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer; }}
+.btn-success {{ background:#10b981; color:white; }}
+.btn-success:hover {{ background:#059669; }}
+</style>
+</head>
+<body>
+<div class="sidebar">
+<h2> {brand}</h2>
+<a href="/admin">Dashboard</a>
+<a href="/admin/ai">AI</a>
+<a href="/admin/telegram">Telegram</a>
+<a href="/admin/whatsapp">WhatsApp</a>
+<a href="/admin/plans" class="active">Plans</a>
+<a href="/admin/config">Config</a>
+</div>
+<div class="main">
+<h1>Plans</h1>
+{html}
+<button class="btn btn-success" onclick="addPlan()" style="margin-top:12px;">Add Plan</button>
+<div id="message" style="margin-top:12px;padding:12px;border-radius:8px;display:none;"></div>
+</div>
+<script>
+let plans = {json.dumps(plans)};
+function addPlan() {{
+    const name = prompt('Enter plan name:');
+    if (!name) return;
+    const price = parseInt(prompt('Enter monthly price (NGN):')) || 0;
+    const features = prompt('Enter features (comma separated):')?.split(',').map(f => f.trim()) || [];
+    plans.push({{name: name, slug: name.toLowerCase().replace(/ /g, '_'), price_monthly: price, features: features, limits: {{requests: price > 0 ? 1000 : 100}}}});
+    savePlans();
+}}
+async function savePlans() {{
+    const msg = document.getElementById('message');
+    try {{
+        const res = await fetch('/api/config/batch', {{
+            method: 'POST',
+            headers: {{'Content-Type': 'application/json'}},
+            body: JSON.stringify({{configs: {{plans: plans}}}})
+        }});
+        const data = await res.json();
+        msg.style.display = 'block';
+        msg.style.background = data.status === 'success' ? '#10b98120' : '#ef444420';
+        msg.style.color = data.status === 'success' ? '#10b981' : '#ef4444';
+        msg.textContent = data.status === 'success' ? 'Plans saved!' : 'Failed';
+        if (data.status === 'success') setTimeout(() => location.reload(), 1000);
+    }} catch(e) {{
+        msg.style.display = 'block';
+        msg.style.background = '#ef444420';
+        msg.style.color = '#ef4444';
+        msg.textContent = 'Error: ' + e.message;
+    }}
+}}
+</script>
+</body>
+</html>
+""")
+
+# ============================================================
+# ADMIN: CONFIG
+# ============================================================
+@app.get("/admin/config")
+async def admin_config():
+    brand = ConfigStore.get("brand_name", "Pocket Lawyer")
+    config = ConfigStore.get_all()
+    return HTMLResponse(f"""
+<!DOCTYPE html>
+<html>
+<head><title>{brand} - Config</title>
+<style>
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }}
+.sidebar {{ width:220px; background:#0f172a; border-right:1px solid #1e293b; padding:24px 16px; position:fixed; top:0; left:0; bottom:0; overflow-y:auto; }}
+.sidebar h2 {{ color:#60a5fa; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid #1e293b; }}
+.sidebar a {{ display:block; padding:10px 14px; color:#94a3b8; text-decoration:none; border-radius:8px; margin-bottom:2px; }}
+.sidebar a:hover {{ background:#1e293b; color:#e2e8f0; }}
+.sidebar a.active {{ background:#1e293b; color:#60a5fa; }}
+.main {{ margin-left:220px; padding:32px 40px; flex:1; }}
+.main h1 {{ font-size:2rem; margin-bottom:24px; }}
+.card {{ background:#1e293b; padding:24px; border-radius:12px; border:1px solid #334155; margin-bottom:20px; }}
+.card h3 {{ margin-bottom:12px; }}
+.btn {{ padding:8px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer; }}
+.btn-primary {{ background:#3b82f6; color:white; }}
+.btn-primary:hover {{ background:#2563eb; }}
+.input-field {{ background:#0f172a; color:#e2e8f0; border:1px solid #334155; border-radius:6px; padding:8px 12px; width:100%; margin-bottom:8px; }}
+.grid-2 {{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }}
+label {{ color:#94a3b8; display:block; margin-bottom:4px; font-size:0.9rem; }}
+</style>
+</head>
+<body>
+<div class="sidebar">
+<h2> {brand}</h2>
+<a href="/admin">Dashboard</a>
+<a href="/admin/ai">AI</a>
+<a href="/admin/telegram">Telegram</a>
+<a href="/admin/whatsapp">WhatsApp</a>
+<a href="/admin/plans">Plans</a>
+<a href="/admin/config" class="active">Config</a>
+</div>
+<div class="main">
+<h1>Configuration</h1>
+<div class="card">
+<h3>Brand Settings</h3>
+<div class="grid-2">
+<div><label>Brand Name</label><input type="text" id="brand_name" class="input-field" value="{config.get('brand_name', 'Pocket Lawyer')}"></div>
+<div><label>Currency</label><input type="text" id="currency" class="input-field" value="{config.get('currency', 'NGN')}"></div>
+</div>
+</div>
+<div class="card">
+<h3>System Prompt</h3>
+<textarea id="system_prompt" class="input-field" rows="6">{config.get('system_prompt', '')}</textarea>
+</div>
+<button class="btn btn-primary" onclick="saveConfig()">Save</button>
+<div id="message" style="margin-top:12px;padding:12px;border-radius:8px;display:none;"></div>
+</div>
+<script>
+async function saveConfig() {{
+    const msg = document.getElementById('message');
+    try {{
+        const res = await fetch('/api/config/batch', {{
+            method: 'POST',
+            headers: {{'Content-Type': 'application/json'}},
+            body: JSON.stringify({{configs: {{
+                brand_name: document.getElementById('brand_name').value,
+                currency: document.getElementById('currency').value,
+                system_prompt: document.getElementById('system_prompt').value
+            }}}})
+        }});
+        const data = await res.json();
+        msg.style.display = 'block';
+        msg.style.background = data.status === 'success' ? '#10b98120' : '#ef444420';
+        msg.style.color = data.status === 'success' ? '#10b981' : '#ef4444';
+        msg.textContent = data.status === 'success' ? 'Saved!' : 'Failed';
+        if (data.status === 'success') setTimeout(() => location.reload(), 1000);
+    }} catch(e) {{
+        msg.style.display = 'block';
+        msg.style.background = '#ef444420';
+        msg.style.color = '#ef4444';
+        msg.textContent = 'Error: ' + e.message;
+    }}
+}}
+</script>
+</body>
+</html>
+""")
+
+# ============================================================
+# TEST ENDPOINTS
+# ============================================================
+@app.post("/api/admin/ai/test")
+async def test_provider(request: Request):
+    data = await request.json()
+    idx = data.get("provider_index")
+    msg = data.get("message", "What is Nigerian contract law?")
+    providers = ConfigStore.get_ai_providers()
+    if idx is None or idx < 0 or idx >= len(providers):
+        return {"status": "error", "response": "Invalid provider"}
+    p = providers[idx]
+    messages = [{"role": "user", "content": msg}]
+    try:
+        if p.get("name") == "OpenRouter":
+            reply, _ = await call_openrouter(p.get("api_key"), p.get("model"), messages)
+        else:
+            reply, _ = await call_provider(p.get("base_url"), p.get("api_key"), p.get("model"), messages)
+        if reply:
+            return {"status": "success", "response": reply[:200]}
+        return {"status": "error", "response": "No response"}
+    except Exception as e:
+        return {"status": "error", "response": str(e)}
+
+# ============================================================
+# TELEGRAM POLLING
+# ============================================================
+telegram_running = False
+telegram_thread = None
+telegram_lock = threading.Lock()
+
+def start_telegram_polling():
+    global telegram_running, telegram_thread
+    with telegram_lock:
+        if telegram_running: return
+        telegram_running = True
+        telegram_thread = threading.Thread(target=run_telegram_polling, daemon=True)
+        telegram_thread.start()
+        logger.info("Telegram polling started")
+
+def stop_telegram_polling():
+    global telegram_running
+    with telegram_lock:
+        telegram_running = False
+        logger.info("Telegram polling stopped")
+
+def run_telegram_polling():
+    global telegram_running
+    logger.info("Telegram polling loop started")
+    offset = 0
+    brand = ConfigStore.get("brand_name", "Pocket Lawyer")
+    while telegram_running:
+        try:
+            tg = ConfigStore.get_telegram()
+            if not tg.get("enabled") or not tg.get("bot_token"):
+                time.sleep(5); continue
+            if offset == 0: offset = tg.get("last_offset", 0)
+            url = f"https://api.telegram.org/bot{tg['bot_token']}/getUpdates"
+            response = httpx.get(url, params={"offset": offset, "timeout": 5}, timeout=15)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("ok"):
+                    for update in data.get("result", []):
+                        offset = update.get("update_id", 0) + 1
+                        ConfigStore.set("telegram", {**tg, "last_offset": offset})
+                        if "message" in update:
+                            msg = update["message"]
+                            chat_id = str(msg.get("chat", {}).get("id", ""))
+                            text = msg.get("text", "")
+                            if chat_id and text and not text.startswith("/"):
+                                loop = asyncio.new_event_loop()
+                                asyncio.set_event_loop(loop)
+                                if is_greeting(text):
+                                    reply = get_greeting_response(brand)
+                                else:
+                                    result = loop.run_until_complete(get_ai_response(text))
+                                    reply = result["reply"]
+                                loop.close()
+                                full_reply = f"{reply}\n\n- {brand}"
+                                send_url = f"https://api.telegram.org/bot{tg['bot_token']}/sendMessage"
+                                httpx.post(send_url, json={"chat_id": chat_id, "text": full_reply[:4000]})
+            elif response.status_code == 409:
+                time.sleep(10)
+        except Exception as e:
+            logger.error(f"Telegram error: {e}")
+        time.sleep(2)
+
+# ============================================================
+# LIFECYCLE
+# ============================================================
+@app.on_event("startup")
+async def startup():
+    logger.info(f"Starting {APP_NAME} v{VERSION}")
+    start_telegram_polling()
+
+@app.on_event("shutdown")
+async def shutdown():
+    stop_telegram_polling()
+    logger.info("Shutting down")
 
 # ============================================================
 # MAIN
